@@ -29,27 +29,41 @@
     </style>
 </head>
 
-<body>
-    <script>
-        const POST = async (url, data) => {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            return response.json()
-        }
-    </script>
+<script>
+    const POST = async (url, data) => {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        return response.json()
+    }
+</script>
+
+<body onload="(() => {
+    const body = {
+        'pin': 2,
+        'state': false
+    }
+    POST('/api/get', body).then((data) => {
+        document.getElementById('state').textContent = data.state ? 'on' : 'off'
+    })
+})()">
     <h1>ESP32 Web Server</h1>
-    <p>LED - State: off</p>
+    <p>LED - State:
+    <div id="state">loading...</div>
+    </p>
     <p><button class="button" onclick="(() => {
         const body = {
             'pin': 2,
             'state': true
         }
         POST('/api/set', body)
+        POST('/api/get', body).then((data) => {
+            document.getElementById('state').textContent = data.state ? 'on' : 'off'
+        })
     })()">ON</button></p>
     <p><button class="button button2" onclick="(() => {
         const body = {
@@ -57,6 +71,9 @@
             'state': false
         }
         POST('/api/set', body)
+        POST('/api/get', body).then((data) => {
+            document.getElementById('state').textContent = data.state ? 'on' : 'off'
+        })
     })()">OFF</button></p>
 </body>
 

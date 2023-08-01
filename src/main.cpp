@@ -9,6 +9,7 @@
 
 #define LED_BUILTIN 2
 #define string String
+#define byte uint8_t
 
 WebServer webServer(80);
 
@@ -58,6 +59,26 @@ void togglePinEP() {
     Serial.printf("Pin: %d, State: %d\n", pin, state ? "true" : "false");
     // send 200
     webServer.send(200, "text/plain", "bazinga");
+}
+
+void getPinEP() {
+    Serial.println("Get pin endpoint called.");
+    Serial.println("Request body:");
+    Serial.println(webServer.arg("plain"));
+    deserializeJson(json, webServer.arg("plain"));
+    if (!json.containsKey("pin"))
+        return webServer.send(400, "text/plain", "Bad request: missing pin");
+    int pin = json["pin"];
+    // get pin state
+    byte mask = digitalPinToBitMask(pin);
+    byte port = digitalPinToPort(pin);
+    if (port == NOT_A_PIN) {
+        return webServer.send(400, "text/plain", "Bad request: invalid pin");
+    }
+    bool state = (*portOutputRegister(port) & mask) ? true : false;
+    Serial.printf("Pin: %d, State: %d\n", pin, state ? "true" : "false");
+    // send 200
+    webServer.send(200, "text/plain", state ? "{\"state\":true}" : "{\"state\":false}");
 }
 
 void setup() {
@@ -110,6 +131,7 @@ void setup() {
     //    "state": true
     // }
     webServer.on("/api/set", HTTP_POST, togglePinEP);
+    webServer.on("/api/get", HTTP_POST, getPinEP);
 
     webServer.begin();
     digitalWrite(LED_BUILTIN, HIGH);
