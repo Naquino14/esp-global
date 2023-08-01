@@ -1,0 +1,63 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ESP Global</title>
+    <link rel="icon" href="favicon.ico">
+    <style>
+        html {
+            font-family: Helvetica;
+            display: inline-block;
+            margin: 0px auto;
+            text-align: center;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 16px 40px;
+            text-decoration: none;
+            font-size: 30px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .button2 {
+            background-color: #555555;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const POST = async (url, data) => {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            return response.json()
+        }
+    </script>
+    <h1>ESP32 Web Server</h1>
+    <p>LED - State: off</p>
+    <p><button class="button" onclick="(() => {
+        const body = {
+            'pin': 2,
+            'state': true
+        }
+        POST('/api/set', body)
+    })()">ON</button></p>
+    <p><button class="button button2" onclick="(() => {
+        const body = {
+            'pin': 2,
+            'state': false
+        }
+        POST('/api/set', body)
+    })()">OFF</button></p>
+</body>
+
+</html>
